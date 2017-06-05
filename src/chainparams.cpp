@@ -202,7 +202,7 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("bitprim.org", "lbnet-seed.bitprim.com"));
+        vSeeds.push_back(CDNSSeedData("bitprim.org", "lbnet-seed.bitprim.org"));
 
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,111);
