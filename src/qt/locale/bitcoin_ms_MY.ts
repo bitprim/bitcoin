@@ -18,13 +18,8 @@
         <translation>&amp;Salin</translation>
     </message>
     <message>
-        <source>Delete the currently selected address from the list</source>
-        <translation>Padam alamat semasa yang dipilih dari senaraiyang dipilih dari senarai</translation>
-    </message>
-    <message>
-        <source>Export the data in the current tab to a file</source>
-        <translation>
-Alihkan fail data ke dalam tab semasa</translation>
+        <source>&amp;Copy Address</source>
+        <translation>&amp;Salin Alamat</translation>
     </message>
     <message>
         <source>&amp;Export</source>
@@ -34,9 +29,29 @@ Alihkan fail data ke dalam tab semasa</translation>
         <source>&amp;Delete</source>
         <translation>&amp;Padam</translation>
     </message>
+    <message>
+        <source>Choose the address to send coins to</source>
+        <translation>Pilih alamat untuk menghantar syiling</translation>
+    </message>
+    <message>
+        <source>Choose the address to receive coins with</source>
+        <translation>Pilih alamat untuk menerima syiling</translation>
+    </message>
+    <message>
+        <source>C&amp;hoose</source>
+        <translation>&amp;Pilih</translation>
+    </message>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>Fail yang dipisahkan dengan koma</translation>
+    </message>
     </context>
 <context>
     <name>AddressTableModel</name>
+    <message>
+        <source>Address</source>
+        <translation>Alamat</translation>
+    </message>
     </context>
 <context>
     <name>AskPassphraseDialog</name>
@@ -50,6 +65,9 @@ Alihkan fail data ke dalam tab semasa</translation>
         <source>&amp;Options...</source>
         <translation>Pilihan</translation>
     </message>
+    </context>
+<context>
+    <name>ClientModel</name>
     </context>
 <context>
     <name>CoinControlDialog</name>
@@ -75,9 +93,6 @@ Alihkan fail data ke dalam tab semasa</translation>
     <name>Intro</name>
     </context>
 <context>
-    <name>ModalOverlay</name>
-    </context>
-<context>
     <name>OpenURIDialog</name>
     </context>
 <context>
@@ -96,9 +111,6 @@ Alihkan fail data ke dalam tab semasa</translation>
     <name>QObject</name>
     </context>
 <context>
-    <name>QObject::QObject</name>
-    </context>
-<context>
     <name>QRImageWidget</name>
     </context>
 <context>
@@ -113,6 +125,10 @@ Alihkan fail data ke dalam tab semasa</translation>
         <source>Copy &amp;Address</source>
         <translation>&amp;Salin Alamat</translation>
     </message>
+    <message>
+        <source>Address</source>
+        <translation>Alamat</translation>
+    </message>
     </context>
 <context>
     <name>RecentRequestsTableModel</name>
@@ -126,9 +142,6 @@ Alihkan fail data ke dalam tab semasa</translation>
     </context>
 <context>
     <name>SendCoinsEntry</name>
-    </context>
-<context>
-    <name>SendConfirmationDialog</name>
     </context>
 <context>
     <name>ShutdownWindow</name>
@@ -153,6 +166,14 @@ Alihkan fail data ke dalam tab semasa</translation>
     </context>
 <context>
     <name>TransactionView</name>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation>Fail yang dipisahkan dengan koma</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Alamat</translation>
+    </message>
     </context>
 <context>
     <name>UnitDisplayStatusBarControl</name>
@@ -166,9 +187,8 @@ Alihkan fail data ke dalam tab semasa</translation>
 <context>
     <name>WalletView</name>
     <message>
-        <source>Export the data in the current tab to a file</source>
-        <translation>
-Alihkan fail data ke dalam tab semasa</translation>
+        <source>&amp;Export</source>
+        <translation>&amp;Eksport</translation>
     </message>
     </context>
 <context>

@@ -1,5 +1,5 @@
-Bitcoin Core
-=============
+Bitcoin Core 0.12.1
+=====================
 
 Intro
 -----

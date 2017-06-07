@@ -10,20 +10,8 @@
         <translation>Maak 'n kopie van die huidige adres na die stelsel klipbord</translation>
     </message>
     <message>
-        <source>&amp;Copy</source>
-        <translation>&amp;Kopie</translation>
-    </message>
-    <message>
-        <source>Delete the currently selected address from the list</source>
-        <translation>Verwyder die huidiglik gekieste address van die lys</translation>
-    </message>
-    <message>
         <source>&amp;Delete</source>
         <translation>&amp;Verwyder</translation>
-    </message>
-    <message>
-        <source>Choose the address to send coins to</source>
-        <translation>Kies die address na wie die muntstukke gestuur moet word</translation>
     </message>
     </context>
 <context>
@@ -84,16 +72,16 @@
         <translation>Verander wagfrase</translation>
     </message>
     <message>
-        <source>Enter the old passphrase and new passphrase to the wallet.</source>
-        <translation>Tik in die ou wagfrase en die nuwe wagfrase vir die beursie.</translation>
-    </message>
-    <message>
         <source>Confirm wallet encryption</source>
         <translation>Bevestig beursie enkripsie.</translation>
     </message>
     <message>
         <source>Wallet encrypted</source>
         <translation>Die beursie is nou bewaak</translation>
+    </message>
+    <message>
+        <source>Enter the old passphrase and new passphrase to the wallet.</source>
+        <translation>Tik in die ou wagfrase en die nuwe wagfrase vir die beursie.</translation>
     </message>
     <message>
         <source>Wallet encryption failed</source>
@@ -123,7 +111,7 @@
         <source>Wallet passphrase was successfully changed.</source>
         <translation>Die beursie se wagfrase verandering was suksesvol.</translation>
     </message>
-    </context>
+</context>
 <context>
     <name>BanTableModel</name>
     </context>
@@ -207,6 +195,9 @@
     </message>
     </context>
 <context>
+    <name>ClientModel</name>
+    </context>
+<context>
     <name>CoinControlDialog</name>
     <message>
         <source>Amount:</source>
@@ -282,13 +273,6 @@
     </message>
     </context>
 <context>
-    <name>ModalOverlay</name>
-    <message>
-        <source>Form</source>
-        <translation>Vorm</translation>
-    </message>
-    </context>
-<context>
     <name>OpenURIDialog</name>
     </context>
 <context>
@@ -321,9 +305,6 @@
         <source>Amount</source>
         <translation>Bedrag</translation>
     </message>
-    </context>
-<context>
-    <name>QObject::QObject</name>
     </context>
 <context>
     <name>QRImageWidget</name>
@@ -384,6 +365,10 @@
         <translation>Boodskap</translation>
     </message>
     <message>
+        <source>Amount</source>
+        <translation>Bedrag</translation>
+    </message>
+    <message>
         <source>(no label)</source>
         <translation>(geen etiket)</translation>
     </message>
@@ -423,18 +408,10 @@
         <translation>Kopieer bedrag</translation>
     </message>
     <message>
-        <source>%1 to %2</source>
-        <translation>%1 tot %2</translation>
-    </message>
-    <message>
-        <source>or</source>
-        <translation>of</translation>
-    </message>
-    <message>
         <source>(no label)</source>
         <translation>(geen etiket)</translation>
     </message>
-</context>
+    </context>
 <context>
     <name>SendCoinsEntry</name>
     <message>
@@ -445,9 +422,6 @@
         <source>Message:</source>
         <translation>Boodskap:</translation>
     </message>
-    </context>
-<context>
-    <name>SendConfirmationDialog</name>
     </context>
 <context>
     <name>ShutdownWindow</name>
@@ -482,10 +456,6 @@
     <message>
         <source>From</source>
         <translation>Van</translation>
-    </message>
-    <message>
-        <source>unknown</source>
-        <translation>onbekend</translation>
     </message>
     <message>
         <source>To</source>
@@ -543,6 +513,10 @@
         <source>false</source>
         <translation>onwaar</translation>
     </message>
+    <message>
+        <source>unknown</source>
+        <translation>onbekend</translation>
+    </message>
 </context>
 <context>
     <name>TransactionDescDialog</name>
@@ -584,10 +558,6 @@
     <message>
         <source>(n/a)</source>
         <translation>(n.v.t)</translation>
-    </message>
-    <message>
-        <source>(no label)</source>
-        <translation>(geen etiket)</translation>
     </message>
     <message>
         <source>Date and time that the transaction was received.</source>
@@ -718,6 +688,10 @@
     <message>
         <source>Information</source>
         <translation>Informasie</translation>
+    </message>
+    <message>
+        <source>This help message</source>
+        <translation>Hierdie help boodskap</translation>
     </message>
     <message>
         <source>Loading addresses...</source>

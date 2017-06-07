@@ -1,4 +1,4 @@
-// Copyright (c) 2011-2016 The Bitcoin Core developers
+// Copyright (c) 2011-2015 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -75,8 +75,6 @@ private:
     QFrame *dateRangeWidget;
     QDateTimeEdit *dateFrom;
     QDateTimeEdit *dateTo;
-    QAction *abandonAction;
-    QAction *bumpFeeAction;
 
     QWidget *createDateRangeWidget();
 
@@ -96,11 +94,8 @@ private Q_SLOTS:
     void copyAmount();
     void copyTxID();
     void copyTxHex();
-    void copyTxPlainText();
     void openThirdPartyTxUrl(QString url);
     void updateWatchOnlyColumn(bool fHaveWatchOnly);
-    void abandonTx();
-    void bumpFee();
 
 Q_SIGNALS:
     void doubleClicked(const QModelIndex&);

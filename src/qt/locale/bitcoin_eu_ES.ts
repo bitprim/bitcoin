@@ -26,6 +26,10 @@
         <translation>&amp;Itxi</translation>
     </message>
     <message>
+        <source>&amp;Copy Address</source>
+        <translation>&amp;Kopiatu helbidea</translation>
+    </message>
+    <message>
         <source>Delete the currently selected address from the list</source>
         <translation>Ezabatu aukeratutako helbideak listatik</translation>
     </message>
@@ -68,10 +72,6 @@
     <message>
         <source>These are your Bitcoin addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
         <translation>Hauek dira zure Bitcoin helbideak dirua jasotzeko. Gomendagarria da erabiltzea jasotzeko helbide berri bat operazio bakoitzeko.</translation>
-    </message>
-    <message>
-        <source>&amp;Copy Address</source>
-        <translation>&amp;Kopiatu helbidea</translation>
     </message>
     <message>
         <source>Copy &amp;Label</source>
@@ -168,12 +168,16 @@
         <translation>Seguru zaude nahi duzula zure diruzorroa enkriptatu?</translation>
     </message>
     <message>
-        <source>Wallet encrypted</source>
-        <translation>Zorroa enkriptatuta</translation>
+        <source>Bitcoin Core will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your bitcoins from being stolen by malware infecting your computer.</source>
+        <translation>Bitcoin Core orain itxiko da enkriptazio prozezua amaitzeko. Gogoratu enkriptatzean zure diruzorroa ez duzula guztiz babesten zure Bitcoinak lapurretatik infektatzen zure ordenagailua Malwareekin.</translation>
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
         <translation>GARRANTZITSUA: Aurreko seguritate-kopiak ordeztuko dire berriekin, enkriptatutak. Segurtasun arrazoigaitik, aurreko kopiak ezin dira erabili hasiko zarenean zure diruzorro enkriptatu berriarekin.</translation>
+    </message>
+    <message>
+        <source>Wallet encrypted</source>
+        <translation>Zorroa enkriptatuta</translation>
     </message>
     <message>
         <source>Wallet encryption failed</source>
@@ -293,6 +297,9 @@
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
         <translation>Zorroa &lt;b&gt;enkriptatuta&lt;/b&gt; eta &lt;b&gt;blokeatuta&lt;/b&gt; dago une honetan</translation>
     </message>
+</context>
+<context>
+    <name>ClientModel</name>
     </context>
 <context>
     <name>CoinControlDialog</name>
@@ -374,13 +381,6 @@
     <name>Intro</name>
     </context>
 <context>
-    <name>ModalOverlay</name>
-    <message>
-        <source>Form</source>
-        <translation>Inprimakia</translation>
-    </message>
-    </context>
-<context>
     <name>OpenURIDialog</name>
     </context>
 <context>
@@ -409,9 +409,6 @@
         <source>Amount</source>
         <translation>Kopurua</translation>
     </message>
-    </context>
-<context>
-    <name>QObject::QObject</name>
     </context>
 <context>
     <name>QRImageWidget</name>
@@ -476,6 +473,10 @@
         <translation>Mezua</translation>
     </message>
     <message>
+        <source>Amount</source>
+        <translation>Kopurua</translation>
+    </message>
+    <message>
         <source>(no label)</source>
         <translation>(etiketarik ez)</translation>
     </message>
@@ -514,7 +515,7 @@
         <source>(no label)</source>
         <translation>(etiketarik ez)</translation>
     </message>
-</context>
+    </context>
 <context>
     <name>SendCoinsEntry</name>
     <message>
@@ -524,6 +525,10 @@
     <message>
         <source>Pay &amp;To:</source>
         <translation>Ordaindu &amp;honi:</translation>
+    </message>
+    <message>
+        <source>Enter a label for this address to add it to your address book</source>
+        <translation>Sartu etiketa bat helbide honetarako, eta gehitu zure helbide-liburuan</translation>
     </message>
     <message>
         <source>&amp;Label:</source>
@@ -549,13 +554,6 @@
         <source>Pay To:</source>
         <translation>Ordaindu honi:</translation>
     </message>
-    <message>
-        <source>Enter a label for this address to add it to your address book</source>
-        <translation>Sartu etiketa bat helbide honetarako, eta gehitu zure helbide-liburuan</translation>
-    </message>
-</context>
-<context>
-    <name>SendConfirmationDialog</name>
     </context>
 <context>
     <name>ShutdownWindow</name>
@@ -600,16 +598,8 @@
         <translation>%1 konfirmazioak</translation>
     </message>
     <message>
-        <source>, has not been successfully broadcast yet</source>
-        <translation>, ez da arrakastaz emititu oraindik</translation>
-    </message>
-    <message>
         <source>Date</source>
         <translation>Data</translation>
-    </message>
-    <message>
-        <source>unknown</source>
-        <translation>ezezaguna</translation>
     </message>
     <message>
         <source>Message</source>
@@ -623,14 +613,26 @@
         <source>Amount</source>
         <translation>Kopurua</translation>
     </message>
-    </context>
+    <message>
+        <source>, has not been successfully broadcast yet</source>
+        <translation>, ez da arrakastaz emititu oraindik</translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation>ezezaguna</translation>
+    </message>
+</context>
 <context>
     <name>TransactionDescDialog</name>
+    <message>
+        <source>Transaction details</source>
+        <translation>Transakzioaren xehetasunak</translation>
+    </message>
     <message>
         <source>This pane shows a detailed description of the transaction</source>
         <translation>Panel honek transakzioaren deskribapen xehea erakusten du</translation>
     </message>
-    </context>
+</context>
 <context>
     <name>TransactionTableModel</name>
     <message>
@@ -640,10 +642,6 @@
     <message>
         <source>Type</source>
         <translation>Mota</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation>Etiketa</translation>
     </message>
     <message>
         <source>Open until %1</source>
@@ -660,6 +658,10 @@
     <message>
         <source>Generated but not accepted</source>
         <translation>Sortua, baina ez onartua</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation>Etiketa</translation>
     </message>
     <message>
         <source>Received with</source>
@@ -680,10 +682,6 @@
     <message>
         <source>(n/a)</source>
         <translation>(n/a)</translation>
-    </message>
-    <message>
-        <source>(no label)</source>
-        <translation>(etiketarik ez)</translation>
     </message>
     <message>
         <source>Transaction status. Hover over this field to show number of confirmations.</source>
@@ -769,6 +767,10 @@
         <translation>Kopiatu etiketa</translation>
     </message>
     <message>
+        <source>Exporting Failed</source>
+        <translation>Esportatua okerra</translation>
+    </message>
+    <message>
         <source>Comma separated file (*.csv)</source>
         <translation>Komaz bereizitako artxiboa (*.csv)</translation>
     </message>
@@ -787,10 +789,6 @@
     <message>
         <source>Address</source>
         <translation>Helbidea</translation>
-    </message>
-    <message>
-        <source>Exporting Failed</source>
-        <translation>Esportatua okerra</translation>
     </message>
     </context>
 <context>
@@ -822,6 +820,10 @@
     <message>
         <source>Options:</source>
         <translation>Aukerak</translation>
+    </message>
+    <message>
+        <source>This help message</source>
+        <translation>Laguntza mezu hau</translation>
     </message>
     <message>
         <source>Rescanning...</source>
