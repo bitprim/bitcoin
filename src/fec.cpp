@@ -141,10 +141,11 @@ public:
         memset(wirehair_precalcs, 0, sizeof(wirehair_precalcs));
         memset(fec_garbage, 0x42, sizeof(fec_garbage));
 
-        for (size_t i = 1; i < sizeof(wirehair_precalcs) / sizeof(wh256_state); i++) {
+        for (size_t i = 1; i < (sizeof(wirehair_precalcs) / sizeof(wh256_state)) / 8 /*TODO REMOVE*/ ; i++) {
             wirehair_precalcs[i] = wh256_encoder_init(NULL, fec_garbage, (i + 1) * FEC_CHUNK_SIZE, FEC_CHUNK_SIZE);
             assert(wirehair_precalcs[i]);
             wh256_free_blocks(wirehair_precalcs[i]);
+            std::cout<< "i " << i <<" OF " << (sizeof(wirehair_precalcs) / sizeof(wh256_state)) / 8 << std::endl;
         }
     }
 } instance_of_fecinit;
