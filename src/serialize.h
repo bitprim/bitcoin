@@ -23,7 +23,7 @@
 
 #include "prevector.h"
 
-static const unsigned int MAX_SIZE = 0x02000000;
+static const unsigned int MAX_SIZE = 0x16000000;
 
 /**
  * Dummy data type to identify deserializing constructors.
