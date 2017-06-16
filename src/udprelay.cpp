@@ -513,7 +513,7 @@ bool HandleBlockMessage(UDPMessage& msg, size_t length, const CService& node, UD
 
     const uint64_t hash_prefix = msg.msg.block.hash_prefix; // Need a reference in a few places, but its packed, so we can't have one directly
 
-    if (msg.msg.block.obj_length > 2000000) {
+    if (msg.msg.block.obj_length > 10000000) {
         LogPrintf("UDP: Got massive obj_length of %u\n", msg.msg.block.obj_length);
         return false;
     }
