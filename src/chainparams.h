@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2015 The Bitcoin Core developers
+// Copyright (c) 2009-2016 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -15,7 +15,11 @@
 
 struct CDNSSeedData {
     std::string name, host;
-    CDNSSeedData(const std::string &strName, const std::string &strHost) : name(strName), host(strHost) {}
+    bool supportsServiceBitsFiltering;
+    CDNSSeedData(const std::string &strName, const std::string &strHost,
+                 bool supportsServiceBitsFilteringIn = false)
+        : name(strName), host(strHost),
+          supportsServiceBitsFiltering(supportsServiceBitsFilteringIn) {}
 };
 
 struct SeedSpec6 {
@@ -27,9 +31,12 @@ typedef std::map<int, uint256> MapCheckpoints;
 
 struct CCheckpointData {
     MapCheckpoints mapCheckpoints;
-    int64_t nTimeLastCheckpoint;
-    int64_t nTransactionsLastCheckpoint;
-    double fTransactionsPerDay;
+};
+
+struct ChainTxData {
+    int64_t nTime;
+    int64_t nTxCount;
+    double dTxRate;
 };
 
 /**
@@ -39,8 +46,7 @@ struct CCheckpointData {
  * a regression test mode which is intended for private networks only. It has
  * minimal difficulty to ensure that blocks can be found instantly.
  */
-class CChainParams
-{
+class CChainParams {
 public:
     enum Base58Type {
         PUBKEY_ADDRESS,
@@ -52,39 +58,39 @@ public:
         MAX_BASE58_TYPES
     };
 
-    const Consensus::Params& GetConsensus() const { return consensus; }
-    const CMessageHeader::MessageStartChars& MessageStart() const { return pchMessageStart; }
-    const std::vector<unsigned char>& AlertKey() const { return vAlertPubKey; }
+    const Consensus::Params &GetConsensus() const { return consensus; }
+    const CMessageHeader::MessageStartChars &MessageStart() const {
+        return pchMessageStart;
+    }
     int GetDefaultPort() const { return nDefaultPort; }
 
-    const CBlock& GenesisBlock() const { return genesis; }
+    const CBlock &GenesisBlock() const { return genesis; }
     /** Make miner wait to have peers to avoid wasting work */
     bool MiningRequiresPeers() const { return fMiningRequiresPeers; }
     /** Default value for -checkmempool and -checkblockindex argument */
     bool DefaultConsistencyChecks() const { return fDefaultConsistencyChecks; }
     /** Policy: Filter transactions that do not match well-defined patterns */
     bool RequireStandard() const { return fRequireStandard; }
-    int64_t MaxTipAge() const { return nMaxTipAge; }
     uint64_t PruneAfterHeight() const { return nPruneAfterHeight; }
-    /** Make miner stop after a block is found. In RPC, don't return until nGenProcLimit blocks are generated */
+    /** Make miner stop after a block is found. In RPC, don't return until
+     * nGenProcLimit blocks are generated */
     bool MineBlocksOnDemand() const { return fMineBlocksOnDemand; }
-    /** In the future use NetworkIDString() for RPC fields */
-    bool TestnetToBeDeprecatedFieldRPC() const { return fTestnetToBeDeprecatedFieldRPC; }
     /** Return the BIP70 network string (main, test or regtest) */
     std::string NetworkIDString() const { return strNetworkID; }
-    const std::vector<CDNSSeedData>& DNSSeeds() const { return vSeeds; }
-    const std::vector<unsigned char>& Base58Prefix(Base58Type type) const { return base58Prefixes[type]; }
-    const std::vector<SeedSpec6>& FixedSeeds() const { return vFixedSeeds; }
-    const CCheckpointData& Checkpoints() const { return checkpointData; }
+    const std::vector<CDNSSeedData> &DNSSeeds() const { return vSeeds; }
+    const std::vector<unsigned char> &Base58Prefix(Base58Type type) const {
+        return base58Prefixes[type];
+    }
+    const std::vector<SeedSpec6> &FixedSeeds() const { return vFixedSeeds; }
+    const CCheckpointData &Checkpoints() const { return checkpointData; }
+    const ChainTxData &TxData() const { return chainTxData; }
+
 protected:
     CChainParams() {}
 
     Consensus::Params consensus;
     CMessageHeader::MessageStartChars pchMessageStart;
-    //! Raw pub key bytes for the broadcast alert signing key.
-    std::vector<unsigned char> vAlertPubKey;
     int nDefaultPort;
-    long nMaxTipAge;
     uint64_t nPruneAfterHeight;
     std::vector<CDNSSeedData> vSeeds;
     std::vector<unsigned char> base58Prefixes[MAX_BASE58_TYPES];
@@ -95,8 +101,8 @@ protected:
     bool fDefaultConsistencyChecks;
     bool fRequireStandard;
     bool fMineBlocksOnDemand;
-    bool fTestnetToBeDeprecatedFieldRPC;
     CCheckpointData checkpointData;
+    ChainTxData chainTxData;
 };
 
 /**
@@ -108,12 +114,18 @@ const CChainParams &Params();
 /**
  * @returns CChainParams for the given BIP70 chain name.
  */
-CChainParams& Params(const std::string& chain);
+CChainParams &Params(const std::string &chain);
 
 /**
  * Sets the params returned by Params() to those for the given BIP70 chain name.
  * @throws std::runtime_error when the chain is not supported.
  */
-void SelectParams(const std::string& chain);
+void SelectParams(const std::string &chain);
+
+/**
+ * Allows modifying the BIP9 regtest parameters.
+ */
+void UpdateRegtestBIP9Parameters(Consensus::DeploymentPos d, int64_t nStartTime,
+                                 int64_t nTimeout);
 
 #endif // BITCOIN_CHAINPARAMS_H

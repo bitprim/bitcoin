@@ -1,5 +1,5 @@
-#!/usr/bin/env python2
-# Copyright (c) 2014-2015 The Bitcoin Core developers
+#!/usr/bin/env python3
+# Copyright (c) 2014-2016 The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -11,6 +11,11 @@ from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import *
 
 class TxnMallTest(BitcoinTestFramework):
+
+    def __init__(self):
+        super().__init__()
+        self.num_nodes = 4
+        self.setup_clean_chain = False
 
     def add_options(self, parser):
         parser.add_option("--mineblock", dest="mine_block", default=False, action="store_true",
@@ -57,7 +62,7 @@ class TxnMallTest(BitcoinTestFramework):
         outputs[node1_address] = 1240
         outputs[change_address] = 1248 - 1240 + doublespend_fee
         rawtx = self.nodes[0].createrawtransaction(inputs, outputs)
-        doublespend = self.nodes[0].signrawtransaction(rawtx)
+        doublespend = self.nodes[0].signrawtransaction(rawtx, None, None, "ALL")
         assert_equal(doublespend["complete"], True)
 
         # Create two spends using 1 50 BTC coin each

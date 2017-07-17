@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2015 The Bitcoin Core developers
+// Copyright (c) 2009-2016 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,17 +8,17 @@
 
 #include "compressor.h"
 #include "core_memusage.h"
+#include "hash.h"
 #include "memusage.h"
 #include "serialize.h"
 #include "uint256.h"
 
-#include <assert.h>
-#include <stdint.h>
+#include <cassert>
+#include <cstdint>
 
-#include <boost/foreach.hpp>
 #include <boost/unordered_map.hpp>
 
-/** 
+/**
  * Pruned version of CTransaction: only retains metadata and unspent transaction outputs
  *
  * Serialized format:
@@ -69,21 +69,24 @@
  *              * 00: special txout type pay-to-pubkey-hash
  *              * 8c988f1a4a4de2161e0f50aac7f17e7f9555caa4: address uint160
  *  - height = 120891
+ *
+ * @DISABLE FORMATING FOR THIS COMMENT@
  */
-class CCoins
-{
+class CCoins {
 public:
     //! whether transaction is a coinbase
     bool fCoinBase;
 
-    //! unspent transaction outputs; spent outputs are .IsNull(); spent outputs at the end of the array are dropped
+    //! unspent transaction outputs; spent outputs are .IsNull(); spent outputs
+    //! at the end of the array are dropped
     std::vector<CTxOut> vout;
 
     //! at which height this transaction was included in the active block chain
     int nHeight;
 
-    //! version of the CTransaction; accesses to this value should probably check for nHeight as well,
-    //! as new tx version will probably only be introduced at certain heights
+    //! version of the CTransaction; accesses to this value should probably
+    //! check for nHeight as well, as new tx version will probably only be
+    //! introduced at certain heights
     int nVersion;
 
     void FromTx(const CTransaction &tx, int nHeightIn) {
@@ -95,9 +98,7 @@ public:
     }
 
     //! construct a CCoins from a CTransaction, at a given height
-    CCoins(const CTransaction &tx, int nHeightIn) {
-        FromTx(tx, nHeightIn);
-    }
+    CCoins(const CTransaction &tx, int nHeightIn) { FromTx(tx, nHeightIn); }
 
     void Clear() {
         fCoinBase = false;
@@ -107,20 +108,18 @@ public:
     }
 
     //! empty constructor
-    CCoins() : fCoinBase(false), vout(0), nHeight(0), nVersion(0) { }
+    CCoins() : fCoinBase(false), vout(0), nHeight(0), nVersion(0) {}
 
-    //!remove spent outputs at the end of vout
+    //! remove spent outputs at the end of vout
     void Cleanup() {
         while (vout.size() > 0 && vout.back().IsNull())
             vout.pop_back();
-        if (vout.empty())
-            std::vector<CTxOut>().swap(vout);
+        if (vout.empty()) std::vector<CTxOut>().swap(vout);
     }
 
     void ClearUnspendable() {
-        BOOST_FOREACH(CTxOut &txout, vout) {
-            if (txout.scriptPubKey.IsUnspendable())
-                txout.SetNull();
+        for (CTxOut &txout : vout) {
+            if (txout.scriptPubKey.IsUnspendable()) txout.SetNull();
         }
         Cleanup();
     }
@@ -134,83 +133,55 @@ public:
 
     //! equality test
     friend bool operator==(const CCoins &a, const CCoins &b) {
-         // Empty CCoins objects are always equal.
-         if (a.IsPruned() && b.IsPruned())
-             return true;
-         return a.fCoinBase == b.fCoinBase &&
-                a.nHeight == b.nHeight &&
-                a.nVersion == b.nVersion &&
-                a.vout == b.vout;
+        // Empty CCoins objects are always equal.
+        if (a.IsPruned() && b.IsPruned()) return true;
+        return a.fCoinBase == b.fCoinBase && a.nHeight == b.nHeight &&
+               a.nVersion == b.nVersion && a.vout == b.vout;
     }
+
     friend bool operator!=(const CCoins &a, const CCoins &b) {
         return !(a == b);
     }
 
     void CalcMaskSize(unsigned int &nBytes, unsigned int &nNonzeroBytes) const;
 
-    bool IsCoinBase() const {
-        return fCoinBase;
-    }
+    bool IsCoinBase() const { return fCoinBase; }
 
-    unsigned int GetSerializeSize(int nType, int nVersion) const {
-        unsigned int nSize = 0;
+    template <typename Stream> void Serialize(Stream &s) const {
         unsigned int nMaskSize = 0, nMaskCode = 0;
         CalcMaskSize(nMaskSize, nMaskCode);
         bool fFirst = vout.size() > 0 && !vout[0].IsNull();
         bool fSecond = vout.size() > 1 && !vout[1].IsNull();
         assert(fFirst || fSecond || nMaskCode);
-        unsigned int nCode = 8*(nMaskCode - (fFirst || fSecond ? 0 : 1)) + (fCoinBase ? 1 : 0) + (fFirst ? 2 : 0) + (fSecond ? 4 : 0);
+        unsigned int nCode = 8 * (nMaskCode - (fFirst || fSecond ? 0 : 1)) +
+                             (fCoinBase ? 1 : 0) + (fFirst ? 2 : 0) +
+                             (fSecond ? 4 : 0);
         // version
-        nSize += ::GetSerializeSize(VARINT(this->nVersion), nType, nVersion);
-        // size of header code
-        nSize += ::GetSerializeSize(VARINT(nCode), nType, nVersion);
-        // spentness bitmask
-        nSize += nMaskSize;
-        // txouts themself
-        for (unsigned int i = 0; i < vout.size(); i++)
-            if (!vout[i].IsNull())
-                nSize += ::GetSerializeSize(CTxOutCompressor(REF(vout[i])), nType, nVersion);
-        // height
-        nSize += ::GetSerializeSize(VARINT(nHeight), nType, nVersion);
-        return nSize;
-    }
-
-    template<typename Stream>
-    void Serialize(Stream &s, int nType, int nVersion) const {
-        unsigned int nMaskSize = 0, nMaskCode = 0;
-        CalcMaskSize(nMaskSize, nMaskCode);
-        bool fFirst = vout.size() > 0 && !vout[0].IsNull();
-        bool fSecond = vout.size() > 1 && !vout[1].IsNull();
-        assert(fFirst || fSecond || nMaskCode);
-        unsigned int nCode = 8*(nMaskCode - (fFirst || fSecond ? 0 : 1)) + (fCoinBase ? 1 : 0) + (fFirst ? 2 : 0) + (fSecond ? 4 : 0);
-        // version
-        ::Serialize(s, VARINT(this->nVersion), nType, nVersion);
+        ::Serialize(s, VARINT(this->nVersion));
         // header code
-        ::Serialize(s, VARINT(nCode), nType, nVersion);
+        ::Serialize(s, VARINT(nCode));
         // spentness bitmask
-        for (unsigned int b = 0; b<nMaskSize; b++) {
+        for (unsigned int b = 0; b < nMaskSize; b++) {
             unsigned char chAvail = 0;
-            for (unsigned int i = 0; i < 8 && 2+b*8+i < vout.size(); i++)
-                if (!vout[2+b*8+i].IsNull())
-                    chAvail |= (1 << i);
-            ::Serialize(s, chAvail, nType, nVersion);
+            for (unsigned int i = 0; i < 8 && 2 + b * 8 + i < vout.size(); i++)
+                if (!vout[2 + b * 8 + i].IsNull()) chAvail |= (1 << i);
+            ::Serialize(s, chAvail);
         }
         // txouts themself
         for (unsigned int i = 0; i < vout.size(); i++) {
             if (!vout[i].IsNull())
-                ::Serialize(s, CTxOutCompressor(REF(vout[i])), nType, nVersion);
+                ::Serialize(s, CTxOutCompressor(REF(vout[i])));
         }
         // coinbase height
-        ::Serialize(s, VARINT(nHeight), nType, nVersion);
+        ::Serialize(s, VARINT(nHeight));
     }
 
-    template<typename Stream>
-    void Unserialize(Stream &s, int nType, int nVersion) {
+    template <typename Stream> void Unserialize(Stream &s) {
         unsigned int nCode = 0;
         // version
-        ::Unserialize(s, VARINT(this->nVersion), nType, nVersion);
+        ::Unserialize(s, VARINT(this->nVersion));
         // header code
-        ::Unserialize(s, VARINT(nCode), nType, nVersion);
+        ::Unserialize(s, VARINT(nCode));
         fCoinBase = nCode & 1;
         std::vector<bool> vAvail(2, false);
         vAvail[0] = (nCode & 2) != 0;
@@ -219,22 +190,20 @@ public:
         // spentness bitmask
         while (nMaskCode > 0) {
             unsigned char chAvail = 0;
-            ::Unserialize(s, chAvail, nType, nVersion);
+            ::Unserialize(s, chAvail);
             for (unsigned int p = 0; p < 8; p++) {
                 bool f = (chAvail & (1 << p)) != 0;
                 vAvail.push_back(f);
             }
-            if (chAvail != 0)
-                nMaskCode--;
+            if (chAvail != 0) nMaskCode--;
         }
         // txouts themself
         vout.assign(vAvail.size(), CTxOut());
         for (unsigned int i = 0; i < vAvail.size(); i++) {
-            if (vAvail[i])
-                ::Unserialize(s, REF(CTxOutCompressor(vout[i])), nType, nVersion);
+            if (vAvail[i]) ::Unserialize(s, REF(CTxOutCompressor(vout[i])));
         }
         // coinbase height
-        ::Unserialize(s, VARINT(nHeight), nType, nVersion);
+        ::Unserialize(s, VARINT(nHeight));
         Cleanup();
     }
 
@@ -249,71 +218,83 @@ public:
     //! check whether the entire CCoins is spent
     //! note that only !IsPruned() CCoins can be serialized
     bool IsPruned() const {
-        BOOST_FOREACH(const CTxOut &out, vout)
-            if (!out.IsNull())
-                return false;
+        for (const CTxOut &out : vout)
+            if (!out.IsNull()) return false;
         return true;
     }
 
     size_t DynamicMemoryUsage() const {
         size_t ret = memusage::DynamicUsage(vout);
-        BOOST_FOREACH(const CTxOut &out, vout) {
+        for (const CTxOut &out : vout) {
             ret += RecursiveDynamicUsage(out.scriptPubKey);
         }
         return ret;
     }
 };
 
-class CCoinsKeyHasher
-{
+class SaltedTxidHasher {
 private:
-    uint256 salt;
+    /** Salt */
+    const uint64_t k0, k1;
 
 public:
-    CCoinsKeyHasher();
+    SaltedTxidHasher();
 
     /**
      * This *must* return size_t. With Boost 1.46 on 32-bit systems the
      * unordered_map will behave unpredictably if the custom hasher returns a
      * uint64_t, resulting in failures when syncing the chain (#4634).
      */
-    size_t operator()(const uint256& key) const {
-        return key.GetHash(salt);
+    size_t operator()(const uint256 &txid) const {
+        return SipHashUint256(k0, k1, txid);
     }
 };
 
-struct CCoinsCacheEntry
-{
+struct CCoinsCacheEntry {
     CCoins coins; // The actual cached data.
     unsigned char flags;
 
     enum Flags {
-        DIRTY = (1 << 0), // This cache entry is potentially different from the version in the parent view.
-        FRESH = (1 << 1), // The parent view does not have this entry (or it is pruned).
+        // This cache entry is potentially different from the version in the
+        // parent view.
+        DIRTY = (1 << 0),
+        // The parent view does not have this entry (or it is pruned).
+        FRESH = (1 << 1),
+        /* Note that FRESH is a performance optimization with which we can erase
+           coins that are fully spent if we know we do not need to flush the
+           changes to the parent cache. It is always safe to not mark FRESH if
+           that condition is not guaranteed. */
     };
 
     CCoinsCacheEntry() : coins(), flags(0) {}
 };
 
-typedef boost::unordered_map<uint256, CCoinsCacheEntry, CCoinsKeyHasher> CCoinsMap;
+typedef boost::unordered_map<uint256, CCoinsCacheEntry, SaltedTxidHasher>
+    CCoinsMap;
 
-struct CCoinsStats
-{
-    int nHeight;
+/** Cursor for iterating over CoinsView state */
+class CCoinsViewCursor {
+public:
+    CCoinsViewCursor(const uint256 &hashBlockIn) : hashBlock(hashBlockIn) {}
+    virtual ~CCoinsViewCursor();
+
+    virtual bool GetKey(uint256 &key) const = 0;
+    virtual bool GetValue(CCoins &coins) const = 0;
+    /* Don't care about GetKeySize here */
+    virtual unsigned int GetValueSize() const = 0;
+
+    virtual bool Valid() const = 0;
+    virtual void Next() = 0;
+
+    //! Get best block at the time this cursor was created
+    const uint256 &GetBestBlock() const { return hashBlock; }
+
+private:
     uint256 hashBlock;
-    uint64_t nTransactions;
-    uint64_t nTransactionOutputs;
-    uint64_t nSerializedSize;
-    uint256 hashSerialized;
-    CAmount nTotalAmount;
-
-    CCoinsStats() : nHeight(0), nTransactions(0), nTransactionOutputs(0), nSerializedSize(0), nTotalAmount(0) {}
 };
 
-
 /** Abstract view on the open txout dataset. */
-class CCoinsView
-{
+class CCoinsView {
 public:
     //! Retrieve the CCoins (unspent transaction outputs) for a given txid
     virtual bool GetCoins(const uint256 &txid, CCoins &coins) const;
@@ -329,17 +310,15 @@ public:
     //! The passed mapCoins can be modified.
     virtual bool BatchWrite(CCoinsMap &mapCoins, const uint256 &hashBlock);
 
-    //! Calculate statistics about the unspent transaction output set
-    virtual bool GetStats(CCoinsStats &stats) const;
+    //! Get a cursor to iterate over the whole state
+    virtual CCoinsViewCursor *Cursor() const;
 
     //! As we use CCoinsViews polymorphically, have a virtual destructor
     virtual ~CCoinsView() {}
 };
 
-
 /** CCoinsView backed by another CCoinsView */
-class CCoinsViewBacked : public CCoinsView
-{
+class CCoinsViewBacked : public CCoinsView {
 protected:
     CCoinsView *base;
 
@@ -350,43 +329,43 @@ public:
     uint256 GetBestBlock() const;
     void SetBackend(CCoinsView &viewIn);
     bool BatchWrite(CCoinsMap &mapCoins, const uint256 &hashBlock);
-    bool GetStats(CCoinsStats &stats) const;
+    CCoinsViewCursor *Cursor() const;
 };
-
 
 class CCoinsViewCache;
 
-/** 
+/**
  * A reference to a mutable cache entry. Encapsulating it allows us to run
  *  cleanup code after the modification is finished, and keeping track of
- *  concurrent modifications. 
+ *  concurrent modifications.
  */
-class CCoinsModifier
-{
+class CCoinsModifier {
 private:
-    CCoinsViewCache& cache;
+    CCoinsViewCache &cache;
     CCoinsMap::iterator it;
-    size_t cachedCoinUsage; // Cached memory usage of the CCoins object before modification
-    CCoinsModifier(CCoinsViewCache& cache_, CCoinsMap::iterator it_, size_t usage);
+    // Cached memory usage of the CCoins object before modification.
+    size_t cachedCoinUsage;
+
+    CCoinsModifier(CCoinsViewCache &cache_, CCoinsMap::iterator it_,
+                   size_t usage);
 
 public:
-    CCoins* operator->() { return &it->second.coins; }
-    CCoins& operator*() { return it->second.coins; }
+    CCoins *operator->() { return &it->second.coins; }
+    CCoins &operator*() { return it->second.coins; }
     ~CCoinsModifier();
     friend class CCoinsViewCache;
 };
 
-/** CCoinsView that adds a memory cache for transactions to another CCoinsView */
-class CCoinsViewCache : public CCoinsViewBacked
-{
+/** CCoinsView that adds a memory cache for transactions to another CCoinsView
+ */
+class CCoinsViewCache : public CCoinsViewBacked {
 protected:
     /* Whether this cache has an active modifier. */
     bool hasModifier;
 
-
     /**
      * Make mutable so that we can "fill the cache" even from Get-methods
-     * declared as "const".  
+     * declared as "const".
      */
     mutable uint256 hashBlock;
     mutable CCoinsMap cacheCoins;
@@ -413,11 +392,11 @@ public:
     bool HaveCoinsInCache(const uint256 &txid) const;
 
     /**
-     * Return a pointer to CCoins in the cache, or NULL if not found. This is
+     * Return a pointer to CCoins in the cache, or nullptr if not found. This is
      * more efficient than GetCoins. Modifications to other cache entries are
      * allowed while accessing the returned pointer.
      */
-    const CCoins* AccessCoins(const uint256 &txid) const;
+    const CCoins *AccessCoins(const uint256 &txid) const;
 
     /**
      * Return a modifiable reference to a CCoins. If no entry with the given
@@ -427,20 +406,22 @@ public:
     CCoinsModifier ModifyCoins(const uint256 &txid);
 
     /**
-     * Return a modifiable reference to a CCoins. Assumes that no entry with the given
-     * txid exists and creates a new one. This saves a database access in the case where
-     * the coins were to be wiped out by FromTx anyway.  This should not be called with
-     * the 2 historical coinbase duplicate pairs because the new coins are marked fresh, and
-     * in the event the duplicate coinbase was spent before a flush, the now pruned coins
-     * would not properly overwrite the first coinbase of the pair. Simultaneous modifications
-     * are not allowed.
+     * Return a modifiable reference to a CCoins. Assumes that no entry with the
+     * given txid exists and creates a new one. This saves a database access in
+     * the case where the coins were to be wiped out by FromTx anyway. This
+     * should not be called with the 2 historical coinbase duplicate pairs
+     * because the new coins are marked fresh, and in the event the duplicate
+     * coinbase was spent before a flush, the now pruned coins would not
+     * properly overwrite the first coinbase of the pair. Simultaneous
+     * modifications are not allowed.
      */
-    CCoinsModifier ModifyNewCoins(const uint256 &txid);
+    CCoinsModifier ModifyNewCoins(const uint256 &txid, bool coinbase);
 
     /**
      * Push the modifications applied to this cache to its base.
-     * Failure to call this method before destruction will cause the changes to be forgotten.
-     * If false is returned, the state of this cache (and its backing view) will be undefined.
+     * Failure to call this method before destruction will cause the changes to
+     * be forgotten. If false is returned, the state of this cache (and its
+     * backing view) will be undefined.
      */
     bool Flush();
 
@@ -456,36 +437,38 @@ public:
     //! Calculate the size of the cache (in bytes)
     size_t DynamicMemoryUsage() const;
 
-    /** 
+    /**
      * Amount of bitcoins coming in to a transaction
-     * Note that lightweight clients may not know anything besides the hash of previous transactions,
-     * so may not be able to calculate this.
+     * Note that lightweight clients may not know anything besides the hash of
+     * previous transactions, so may not be able to calculate this.
      *
      * @param[in] tx	transaction for which we are checking input total
      * @return	Sum of value of all inputs (scriptSigs)
      */
-    CAmount GetValueIn(const CTransaction& tx) const;
+    CAmount GetValueIn(const CTransaction &tx) const;
 
-    //! Check whether all prevouts of the transaction are present in the UTXO set represented by this view
-    bool HaveInputs(const CTransaction& tx) const;
+    //! Check whether all prevouts of the transaction are present in the UTXO
+    //! set represented by this view
+    bool HaveInputs(const CTransaction &tx) const;
 
     /**
-     * Return priority of tx at height nHeight. Also calculate the sum of the values of the inputs
-     * that are already in the chain.  These are the inputs that will age and increase priority as
-     * new blocks are added to the chain.
+     * Return priority of tx at height nHeight. Also calculate the sum of the
+     * values of the inputs that are already in the chain. These are the inputs
+     * that will age and increase priority as new blocks are added to the chain.
      */
-    double GetPriority(const CTransaction &tx, int nHeight, CAmount &inChainInputValue) const;
+    double GetPriority(const CTransaction &tx, int nHeight,
+                       CAmount &inChainInputValue) const;
 
-    const CTxOut &GetOutputFor(const CTxIn& input) const;
+    const CTxOut &GetOutputFor(const CTxIn &input) const;
 
     friend class CCoinsModifier;
 
 private:
-    CCoinsMap::iterator FetchCoins(const uint256 &txid);
     CCoinsMap::const_iterator FetchCoins(const uint256 &txid) const;
 
     /**
-     * By making the copy constructor private, we prevent accidentally using it when one intends to create a cache on top of a base cache.
+     * By making the copy constructor private, we prevent accidentally using it
+     * when one intends to create a cache on top of a base cache.
      */
     CCoinsViewCache(const CCoinsViewCache &);
 };

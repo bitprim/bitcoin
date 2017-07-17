@@ -1,52 +1,51 @@
-// Copyright (c) 2015 The Bitcoin Core developers
+// Copyright (c) 2015-2016 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "zmqnotificationinterface.h"
 #include "zmqpublishnotifier.h"
 
-#include "version.h"
-#include "main.h"
 #include "streams.h"
 #include "util.h"
+#include "validation.h"
+#include "version.h"
 
-void zmqError(const char *str)
-{
+void zmqError(const char *str) {
     LogPrint("zmq", "zmq: Error: %s, errno=%s\n", str, zmq_strerror(errno));
 }
 
-CZMQNotificationInterface::CZMQNotificationInterface() : pcontext(NULL)
-{
-}
+CZMQNotificationInterface::CZMQNotificationInterface() : pcontext(nullptr) {}
 
-CZMQNotificationInterface::~CZMQNotificationInterface()
-{
+CZMQNotificationInterface::~CZMQNotificationInterface() {
     Shutdown();
 
-    for (std::list<CZMQAbstractNotifier*>::iterator i=notifiers.begin(); i!=notifiers.end(); ++i)
-    {
+    for (std::list<CZMQAbstractNotifier *>::iterator i = notifiers.begin();
+         i != notifiers.end(); ++i) {
         delete *i;
     }
 }
 
-CZMQNotificationInterface* CZMQNotificationInterface::CreateWithArguments(const std::map<std::string, std::string> &args)
-{
-    CZMQNotificationInterface* notificationInterface = NULL;
+CZMQNotificationInterface *CZMQNotificationInterface::Create() {
+    CZMQNotificationInterface *notificationInterface = nullptr;
     std::map<std::string, CZMQNotifierFactory> factories;
-    std::list<CZMQAbstractNotifier*> notifiers;
+    std::list<CZMQAbstractNotifier *> notifiers;
 
-    factories["pubhashblock"] = CZMQAbstractNotifier::Create<CZMQPublishHashBlockNotifier>;
-    factories["pubhashtx"] = CZMQAbstractNotifier::Create<CZMQPublishHashTransactionNotifier>;
-    factories["pubrawblock"] = CZMQAbstractNotifier::Create<CZMQPublishRawBlockNotifier>;
-    factories["pubrawtx"] = CZMQAbstractNotifier::Create<CZMQPublishRawTransactionNotifier>;
+    factories["pubhashblock"] =
+        CZMQAbstractNotifier::Create<CZMQPublishHashBlockNotifier>;
+    factories["pubhashtx"] =
+        CZMQAbstractNotifier::Create<CZMQPublishHashTransactionNotifier>;
+    factories["pubrawblock"] =
+        CZMQAbstractNotifier::Create<CZMQPublishRawBlockNotifier>;
+    factories["pubrawtx"] =
+        CZMQAbstractNotifier::Create<CZMQPublishRawTransactionNotifier>;
 
-    for (std::map<std::string, CZMQNotifierFactory>::const_iterator i=factories.begin(); i!=factories.end(); ++i)
-    {
-        std::map<std::string, std::string>::const_iterator j = args.find("-zmq" + i->first);
-        if (j!=args.end())
-        {
+    for (std::map<std::string, CZMQNotifierFactory>::const_iterator i =
+             factories.begin();
+         i != factories.end(); ++i) {
+        std::string arg("-zmq" + i->first);
+        if (IsArgSet(arg)) {
             CZMQNotifierFactory factory = i->second;
-            std::string address = j->second;
+            std::string address = GetArg(arg, "");
             CZMQAbstractNotifier *notifier = factory();
             notifier->SetType(i->first);
             notifier->SetAddress(address);
@@ -54,15 +53,13 @@ CZMQNotificationInterface* CZMQNotificationInterface::CreateWithArguments(const 
         }
     }
 
-    if (!notifiers.empty())
-    {
+    if (!notifiers.empty()) {
         notificationInterface = new CZMQNotificationInterface();
         notificationInterface->notifiers = notifiers;
 
-        if (!notificationInterface->Initialize())
-        {
+        if (!notificationInterface->Initialize()) {
             delete notificationInterface;
-            notificationInterface = NULL;
+            notificationInterface = nullptr;
         }
     }
 
@@ -70,37 +67,31 @@ CZMQNotificationInterface* CZMQNotificationInterface::CreateWithArguments(const 
 }
 
 // Called at startup to conditionally set up ZMQ socket(s)
-bool CZMQNotificationInterface::Initialize()
-{
+bool CZMQNotificationInterface::Initialize() {
     LogPrint("zmq", "zmq: Initialize notification interface\n");
     assert(!pcontext);
 
     pcontext = zmq_init(1);
 
-    if (!pcontext)
-    {
+    if (!pcontext) {
         zmqError("Unable to initialize context");
         return false;
     }
 
-    std::list<CZMQAbstractNotifier*>::iterator i=notifiers.begin();
-    for (; i!=notifiers.end(); ++i)
-    {
+    std::list<CZMQAbstractNotifier *>::iterator i = notifiers.begin();
+    for (; i != notifiers.end(); ++i) {
         CZMQAbstractNotifier *notifier = *i;
-        if (notifier->Initialize(pcontext))
-        {
-            LogPrint("zmq", "  Notifier %s ready (address = %s)\n", notifier->GetType(), notifier->GetAddress());
-        }
-        else
-        {
-            LogPrint("zmq", "  Notifier %s failed (address = %s)\n", notifier->GetType(), notifier->GetAddress());
+        if (notifier->Initialize(pcontext)) {
+            LogPrint("zmq", "  Notifier %s ready (address = %s)\n",
+                     notifier->GetType(), notifier->GetAddress());
+        } else {
+            LogPrint("zmq", "  Notifier %s failed (address = %s)\n",
+                     notifier->GetType(), notifier->GetAddress());
             break;
         }
     }
 
-    if (i!=notifiers.end())
-    {
-        Shutdown();
+    if (i != notifiers.end()) {
         return false;
     }
 
@@ -108,15 +99,14 @@ bool CZMQNotificationInterface::Initialize()
 }
 
 // Called during shutdown sequence
-void CZMQNotificationInterface::Shutdown()
-{
+void CZMQNotificationInterface::Shutdown() {
     LogPrint("zmq", "zmq: Shutdown notification interface\n");
-    if (pcontext)
-    {
-        for (std::list<CZMQAbstractNotifier*>::iterator i=notifiers.begin(); i!=notifiers.end(); ++i)
-        {
+    if (pcontext) {
+        for (std::list<CZMQAbstractNotifier *>::iterator i = notifiers.begin();
+             i != notifiers.end(); ++i) {
             CZMQAbstractNotifier *notifier = *i;
-            LogPrint("zmq", "   Shutdown notifier %s at %s\n", notifier->GetType(), notifier->GetAddress());
+            LogPrint("zmq", "   Shutdown notifier %s at %s\n",
+                     notifier->GetType(), notifier->GetAddress());
             notifier->Shutdown();
         }
         zmq_ctx_destroy(pcontext);
@@ -125,34 +115,33 @@ void CZMQNotificationInterface::Shutdown()
     }
 }
 
-void CZMQNotificationInterface::UpdatedBlockTip(const CBlockIndex *pindex)
-{
-    for (std::list<CZMQAbstractNotifier*>::iterator i = notifiers.begin(); i!=notifiers.end(); )
-    {
+void CZMQNotificationInterface::UpdatedBlockTip(const CBlockIndex *pindexNew,
+                                                const CBlockIndex *pindexFork,
+                                                bool fInitialDownload) {
+    // In IBD or blocks were disconnected without any new ones
+    if (fInitialDownload || pindexNew == pindexFork) return;
+
+    for (std::list<CZMQAbstractNotifier *>::iterator i = notifiers.begin();
+         i != notifiers.end();) {
         CZMQAbstractNotifier *notifier = *i;
-        if (notifier->NotifyBlock(pindex))
-        {
+        if (notifier->NotifyBlock(pindexNew)) {
             i++;
-        }
-        else
-        {
+        } else {
             notifier->Shutdown();
             i = notifiers.erase(i);
         }
     }
 }
 
-void CZMQNotificationInterface::SyncTransaction(const CTransaction &tx, const CBlock *pblock)
-{
-    for (std::list<CZMQAbstractNotifier*>::iterator i = notifiers.begin(); i!=notifiers.end(); )
-    {
+void CZMQNotificationInterface::SyncTransaction(const CTransaction &tx,
+                                                const CBlockIndex *pindex,
+                                                int posInBlock) {
+    for (std::list<CZMQAbstractNotifier *>::iterator i = notifiers.begin();
+         i != notifiers.end();) {
         CZMQAbstractNotifier *notifier = *i;
-        if (notifier->NotifyTransaction(tx))
-        {
+        if (notifier->NotifyTransaction(tx)) {
             i++;
-        }
-        else
-        {
+        } else {
             notifier->Shutdown();
             i = notifiers.erase(i);
         }
