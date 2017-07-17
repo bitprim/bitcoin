@@ -9,6 +9,7 @@
 #include "script_error.h"
 #include "primitives/transaction.h"
 
+#include <cstdint>
 #include <vector>
 #include <stdint.h>
 #include <string>
@@ -24,6 +25,7 @@ enum
     SIGHASH_ALL = 1,
     SIGHASH_NONE = 2,
     SIGHASH_SINGLE = 3,
+    SIGHASH_FORKID = 0x40,
     SIGHASH_ANYONECANPAY = 0x80,
 };
 
@@ -94,6 +96,11 @@ enum
     // Making v1-v16 witness program non-standard
     //
     SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM = (1U << 12),
+
+
+    // Do we accept signature using SIGHASH_FORKID
+    //
+    SCRIPT_ENABLE_SIGHASH_FORKID = (1U << 16),
 };
 
 bool CheckSignatureEncoding(const std::vector<unsigned char> &vchSig, unsigned int flags, ScriptError* serror);
@@ -104,7 +111,13 @@ enum SigVersion
     SIGVERSION_WITNESS_V0 = 1,
 };
 
-uint256 SignatureHash(const CScript &scriptCode, const CTransaction& txTo, unsigned int nIn, int nHashType, const CAmount& amount, SigVersion sigversion);
+bool CheckSignatureEncoding(const std::vector<unsigned char> &vchSig,
+                            unsigned int flags, ScriptError *serror);
+//uint256 SignatureHash(const CScript &scriptCode, const CTransaction& txTo, unsigned int nIn, int nHashType, const CAmount& amount, SigVersion sigversion);
+
+uint256 SignatureHash(const CScript &scriptCode, const CTransaction &txTo,
+                      unsigned int nIn, uint32_t nHashType,
+                      const CAmount &amount);
 
 class BaseSignatureChecker
 {
