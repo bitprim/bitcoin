@@ -69,9 +69,14 @@ void TxToJSONExpanded(const CTransaction& tx, const uint256 hashBlock, UniValue&
 
     uint256 txid = tx.GetHash();
     entry.push_back(Pair("txid", txid.GetHex()));
-    entry.push_back(Pair("hash", tx.GetWitnessHash().GetHex()));
+    //ABC-FIX
+    //entry.push_back(Pair("hash", tx.GetWitnessHash().GetHex()));
+    entry.push_back(Pair("hash", tx.GetHash().GetHex()));
     entry.push_back(Pair("size", (int)::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION)));
-    entry.push_back(Pair("vsize", (int)::GetVirtualTransactionSize(tx)));
+    //ABC-FIX
+    //entry.push_back(Pair("vsize", (int)::GetVirtualTransactionSize(tx)));
+    entry.push_back(Pair("vsize", (int)::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION)));
+
     entry.push_back(Pair("version", tx.nVersion));
     entry.push_back(Pair("locktime", (int64_t)tx.nLockTime));
     UniValue vin(UniValue::VARR);
@@ -102,7 +107,9 @@ void TxToJSONExpanded(const CTransaction& tx, const uint256 hashBlock, UniValue&
             }
 
         }
-        if (!tx.wit.IsNull()) {
+
+        //Bitcoin-abc no witness
+        /*if (!tx.wit.IsNull()) {
             if (!tx.wit.vtxinwit[i].IsNull()) {
                 UniValue txinwitness(UniValue::VARR);
                 for (unsigned int j = 0; j < tx.wit.vtxinwit[i].scriptWitness.stack.size(); j++) {
@@ -112,7 +119,7 @@ void TxToJSONExpanded(const CTransaction& tx, const uint256 hashBlock, UniValue&
                 in.push_back(Pair("txinwitness", txinwitness));
             }
 
-        }
+        }*/
         in.push_back(Pair("sequence", (int64_t)txin.nSequence));
         vin.push_back(in);
     }
@@ -338,7 +345,10 @@ static UniValue getrawtransaction(const Config &config,
         }
     }
 
-    CTransactionRef tx;
+    //ABC-FIX
+    //CTransactionRef tx;
+    CTransaction tx;
+
     uint256 hashBlock;
 
     //BITCORE
@@ -376,7 +386,9 @@ static UniValue getrawtransaction(const Config &config,
                 ". Use gettransaction for wallet transactions.");
     }
 */
-    std::string strHex = EncodeHexTx(*tx, RPCSerializationFlags());
+    //ABC-FIX
+    //std::string strHex = EncodeHexTx(*tx, RPCSerializationFlags());
+    std::string strHex = EncodeHexTx(tx);
 
     if (!fVerbose) {
         return strHex;

@@ -337,6 +337,11 @@ std::string GetWarnings(const std::string &strFor);
 bool GetTransaction(const Config &config, const uint256 &hash,
                     CTransactionRef &tx, uint256 &hashBlock,
                     bool fAllowSlow = false);
+
+//BITCORE
+/** Retrieve a transaction (from memory pool, or from disk, if possible) */
+bool GetTransaction(const uint256 &hash, CTransaction &tx, const Consensus::Params& params, uint256 &hashBlock, bool fAllowSlow = false);
+
 /** Find the best known block, and make it the tip of the block chain */
 bool ActivateBestChain(
     const Config &config, CValidationState &state,
