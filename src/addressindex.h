@@ -18,7 +18,7 @@ struct CAddressUnspentKey {
     uint256 txhash;
     size_t index;
 
-    size_t GetSerializeSize(int nType, int nVersion) const {
+    size_t GetSerializeSize(/*int nType, int nVersion*/) const {
         return 57;
     }
     template<typename Stream>
@@ -99,7 +99,7 @@ struct CAddressIndexKey {
     size_t index;
     bool spending;
 
-    size_t GetSerializeSize(int nType, int nVersion) const {
+    size_t GetSerializeSize(/*int nType, int nVersion*/) const {
         return 66;
     }
     template<typename Stream>
@@ -157,7 +157,7 @@ struct CAddressIndexIteratorKey {
     unsigned int type;
     uint160 hashBytes;
 
-    size_t GetSerializeSize(int nType, int nVersion) const {
+    size_t GetSerializeSize(/*int nType, int nVersion*/) const {
         return 21;
     }
     template<typename Stream>
@@ -191,7 +191,7 @@ struct CAddressIndexIteratorHeightKey {
     uint160 hashBytes;
     int blockHeight;
 
-    size_t GetSerializeSize(int nType, int nVersion) const {
+    size_t GetSerializeSize(/*int nType, int nVersion*/) const {
         return 25;
     }
     template<typename Stream>

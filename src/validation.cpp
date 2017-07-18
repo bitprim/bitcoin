@@ -55,6 +55,7 @@
 
 //BITCORE
 using namespace std;
+#include <boost/foreach.hpp>
 
 /**
  * Global state
@@ -1148,9 +1149,10 @@ bool GetTransaction(const uint256 &hash, CTransaction &txOut, const Consensus::P
     if (pindexSlow) {
         CBlock block;
         if (ReadBlockFromDisk(block, pindexSlow, consensusParams)) {
-            BOOST_FOREACH(const CTransaction &tx, block.vtx) {
-                if (tx.GetHash() == hash) {
-                    txOut = tx;
+        //ABC-FIX= CTransaction changed to auto, tx.GetHash() changed to -> , txOut=tx -> *tx
+            BOOST_FOREACH(const auto &tx, block.vtx) {
+                if (tx->GetHash() == hash) {
+                    txOut = *tx;
                     hashBlock = pindexSlow->GetBlockHash();
                     return true;
                 }
@@ -1699,7 +1701,11 @@ bool ApplyBlockUndo(const CBlock &block, CValidationState &state,
     // Undo transactions in reverse order.
     size_t i = block.vtx.size();
     while (i-- > 0) {
-        const CTransaction &tx = *(block.vtx[i]);
+        //const CTransaction &tx = *(block.vtx[i]);
+        //ABC-FIX:
+        const auto &txptr = block.vtx[i];
+        const auto &tx = *txptr;
+
         uint256 txid = tx.GetId();
 
         //BITCORE
@@ -1712,7 +1718,9 @@ bool ApplyBlockUndo(const CBlock &block, CValidationState &state,
                     vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.begin()+22);
 
                     // undo receiving activity
-                    addressIndex.push_back(make_pair(CAddressIndexKey(2, uint160(hashBytes), pindex->nHeight, i, hash, k, false), out.nValue));
+                    //ABC-FIX TODO: FIX STRUCT CREATION
+                    struct CAddressIndexKey value (2, uint160(hashBytes), pindex->nHeight, i, hash, k, false);
+                    addressIndex.push_back(std::make_pair(value, out.nValue));
 
                     // undo unspent index
                     addressUnspentIndex.push_back(make_pair(CAddressUnspentKey(2, uint160(hashBytes), hash, k), CAddressUnspentValue()));
