@@ -1744,6 +1744,10 @@ static const CRPCCommand commands[] = {
     { "blockchain",         "getbestblockhash",       getbestblockhash,       true,  {} },
     { "blockchain",         "getblockcount",          getblockcount,          true,  {} },
     { "blockchain",         "getblock",               getblock,               true,  {"blockhash","verbose"} },
+    //BITCORE
+    { "blockchain",         "getblockdeltas",         &getblockdeltas,         false },
+    { "blockchain",         "getblockhashes",         &getblockhashes,         true  },
+
     { "blockchain",         "getblockhash",           getblockhash,           true,  {"height"} },
     { "blockchain",         "getblockheader",         getblockheader,         true,  {"blockhash","verbose"} },
     { "blockchain",         "getchaintips",           getchaintips,           true,  {} },
