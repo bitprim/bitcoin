@@ -1124,16 +1124,15 @@ static const CRPCCommand commands[] = {
     { "util",               "signmessagewithprivkey", signmessagewithprivkey, true,  {"privkey","message"} },
 
     //BITCORE
-
-    /* Address index */
-    { "addressindex",       "getaddressmempool",      &getaddressmempool,      true  },
-    { "addressindex",       "getaddressutxos",        &getaddressutxos,        false },
-    { "addressindex",       "getaddressdeltas",       &getaddressdeltas,       false },
-    { "addressindex",       "getaddresstxids",        &getaddresstxids,        false },
-    { "addressindex",       "getaddressbalance",      &getaddressbalance,      false },
-
-    /* Blockchain */
-    { "blockchain",         "getspentinfo",           &getspentinfo,           false },
+/*
+    //Address index
+    { "addressindex",       "getaddressmempool",      getaddressmempool,      true,   {} },
+    { "addressindex",       "getaddressutxos",        getaddressutxos,        false,  {} },
+    { "addressindex",       "getaddressdeltas",       getaddressdeltas,       false,  {} },
+    { "addressindex",       "getaddresstxids",        getaddresstxids,        false,  {} },
+    { "addressindex",       "getaddressbalance",      getaddressbalance,      false,  {} },
+    //Blockchain
+    { "blockchain",         "getspentinfo",           getspentinfo,           false,  {} },*/
 
 
     /* Not shown in help */

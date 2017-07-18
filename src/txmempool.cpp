@@ -22,6 +22,9 @@
 
 #include <boost/range/adaptor/reversed.hpp>
 
+//BITCORE
+using namespace std;
+
 CTxMemPoolEntry::CTxMemPoolEntry(const CTransactionRef &_tx,
                                  const CAmount &_nFee, int64_t _nTime,
                                  double _entryPriority,

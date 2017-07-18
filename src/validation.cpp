@@ -53,6 +53,9 @@
 #error "Bitcoin cannot be compiled without assertions."
 #endif
 
+//BITCORE
+using namespace std;
+
 /**
  * Global state
  */

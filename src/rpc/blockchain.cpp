@@ -131,7 +131,7 @@ UniValue blockToDeltasJSON(const CBlock& block, const CBlockIndex* blockindex)
     UniValue deltas(UniValue::VARR);
 
     for (unsigned int i = 0; i < block.vtx.size(); i++) {
-        const CTransaction &tx = block.vtx[i];
+        const CTransaction &tx = *block.vtx[i];
         const uint256 txhash = tx.GetHash();
 
         UniValue entry(UniValue::VOBJ);
@@ -1744,10 +1744,8 @@ static const CRPCCommand commands[] = {
     { "blockchain",         "getbestblockhash",       getbestblockhash,       true,  {} },
     { "blockchain",         "getblockcount",          getblockcount,          true,  {} },
     { "blockchain",         "getblock",               getblock,               true,  {"blockhash","verbose"} },
-    //BITCORE
-    { "blockchain",         "getblockdeltas",         &getblockdeltas,         false },
-    { "blockchain",         "getblockhashes",         &getblockhashes,         true  },
-
+//    { "blockchain",         "getblockdeltas",         getblockdeltas,         false, {} },
+//    { "blockchain",         "getblockhashes",         getblockhashes,         true,  {} },
     { "blockchain",         "getblockhash",           getblockhash,           true,  {"height"} },
     { "blockchain",         "getblockheader",         getblockheader,         true,  {"blockhash","verbose"} },
     { "blockchain",         "getchaintips",           getchaintips,           true,  {} },
