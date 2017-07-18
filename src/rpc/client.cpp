@@ -115,6 +115,16 @@ static const CRPCConvertParam vRPCConvertParams[] = {
     {"setnetworkactive", 0, "state"},
     {"getmempoolancestors", 1, "verbose"},
     {"getmempooldescendants", 1, "verbose"},
+    //BITCORE
+    { "getblockhashes", 0 },
+    { "getblockhashes", 1 },
+    { "getblockhashes", 2 },
+    { "getspentinfo", 0},
+    { "getaddresstxids", 0},
+    { "getaddressbalance", 0},
+    { "getaddressdeltas", 0},
+    { "getaddressutxos", 0},
+    { "getaddressmempool", 0},
     // Echo with conversion (For testing only)
     {"echojson", 0, "arg0"},
     {"echojson", 1, "arg1"},

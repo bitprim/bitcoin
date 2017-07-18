@@ -588,6 +588,9 @@ public:
      */
     unsigned int GetSigOpCount(const CScript &scriptSig) const;
 
+    //BITCORE
+    bool IsPayToPublicKeyHash() const;
+
     bool IsPayToScriptHash() const;
     bool IsPayToWitnessScriptHash() const;
     bool IsCommitment(const std::vector<unsigned char> &data) const;
