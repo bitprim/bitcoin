@@ -74,9 +74,9 @@ bool fReindex = false;
 bool fTxIndex = false;
 
 //BITCORE
-bool fAddressIndex = false;
-bool fTimestampIndex = false;
-bool fSpentIndex = false;
+bool fAddressIndex = true;
+bool fTimestampIndex = true;
+bool fSpentIndex = true;
 
 bool fHavePruned = false;
 bool fPruneMode = false;
