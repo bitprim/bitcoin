@@ -1100,16 +1100,20 @@ bool GetTransaction(const Config &config, const uint256 &txid,
 
 //BITCORE
 /** Return transaction in tx, and if it was found inside a block, its hash is placed in hashBlock */
-bool GetTransaction(const uint256 &hash, CTransaction &txOut, const Consensus::Params& consensusParams, uint256 &hashBlock, bool fAllowSlow)
+/*bool GetTransaction(const uint256 &hash, CTransaction &txOut, const Consensus::Params& consensusParams, uint256 &hashBlock, bool fAllowSlow)
 {
     CBlockIndex *pindexSlow = NULL;
 
     LOCK(cs_main);
+    //ABC-FIX
+    //std::shared_ptr<const CTransaction> ptx = mempool.get(hash);
+    CTransactionRef ptx = mempool.get(hash);
 
-    std::shared_ptr<const CTransaction> ptx = mempool.get(hash);
     if (ptx)
     {
-        txOut = *ptx;
+        //ABC-FIX
+        //txOut = *ptx;
+        txOut = ptx;
         return true;
     }
 
@@ -1123,7 +1127,10 @@ bool GetTransaction(const uint256 &hash, CTransaction &txOut, const Consensus::P
             try {
                 file >> header;
                 fseek(file.Get(), postx.nTxOffset, SEEK_CUR);
-                file >> txOut;
+                //ABC-FIX
+                CTransactionRef temp;
+                file >> temp;
+                txOut = temp;
             } catch (const std::exception& e) {
                 return error("%s: Deserialize or I/O error - %s", __func__, e.what());
             }
@@ -1162,7 +1169,7 @@ bool GetTransaction(const uint256 &hash, CTransaction &txOut, const Consensus::P
 
     return false;
 }
-
+*/
 //////////////////////////////////////////////////////////////////////////////
 //
 // CBlock and CBlockIndex

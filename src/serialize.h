@@ -911,7 +911,7 @@ template <typename S, typename T>
 size_t GetSerializeSize(const S &s, const T &t) {
     return (CSizeComputer(s.GetType(), s.GetVersion()) << t).size();
 }
-
+/*
 //BITCORE
 template<typename Stream, typename T>
 inline void Unserialize(Stream& is, T& a, long nType, int nVersion)
@@ -926,6 +926,6 @@ void Unserialize(Stream& is, std::pair<K, T>& item, int nType, int nVersion)
     Unserialize(is, item.first, nType, nVersion);
     Unserialize(is, item.second, nType, nVersion);
 }
-
+*/
 
 #endif // BITCOIN_SERIALIZE_H

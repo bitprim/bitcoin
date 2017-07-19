@@ -345,10 +345,7 @@ static UniValue getrawtransaction(const Config &config,
         }
     }
 
-    //ABC-FIX
-    //CTransactionRef tx;
-    CTransaction tx;
-
+    CTransactionRef tx;
     uint256 hashBlock;
 
     //BITCORE
@@ -358,7 +355,9 @@ static UniValue getrawtransaction(const Config &config,
 
     {
         LOCK(cs_main);
-        if (!GetTransaction(hash, tx, Params().GetConsensus(), hashBlock, true))
+        //ABC-FIX
+        //if (!GetTransaction(hash, tx, Params().GetConsensus(), hashBlock, true))
+         if (!GetTransaction(config, hash, tx, hashBlock, true)) 
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available about transaction");
 
         BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
@@ -386,9 +385,7 @@ static UniValue getrawtransaction(const Config &config,
                 ". Use gettransaction for wallet transactions.");
     }
 */
-    //ABC-FIX
-    //std::string strHex = EncodeHexTx(*tx, RPCSerializationFlags());
-    std::string strHex = EncodeHexTx(tx);
+    std::string strHex = EncodeHexTx(*tx, RPCSerializationFlags());
 
     if (!fVerbose) {
         return strHex;
@@ -398,7 +395,7 @@ static UniValue getrawtransaction(const Config &config,
     result.push_back(Pair("hex", strHex));
     //BITCORE
     //TxToJSON(*tx, hashBlock, result);
-    TxToJSONExpanded(tx, hashBlock, result, nHeight, nConfirmations, nBlockTime);
+    TxToJSONExpanded(*tx, hashBlock, result, nHeight, nConfirmations, nBlockTime);
     return result;
 }
 
